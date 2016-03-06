@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import cPickle
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -54,8 +55,8 @@ class AutoEncoder:
         # rho = np.tile(sparsity_param, hidden_size)
 
         # Cost function
-        cost = np.sum((a3 - data) ** 2) / (2 * m) +  (lambda_ / 2) * (np.sum(self.W1 ** 2) + np.sum(self.W2 ** 2)) +  beta * np.sum(KL_divergence(rho, rho_hat))
-        # cost = np.sum((a3 - data) ** 2) / (2 * m) 
+        # cost = np.sum((a3 - data) ** 2) / (2 * m) +  (lambda_ / 2) * (np.sum(self.W1 ** 2) + np.sum(self.W2 ** 2)) +  beta * np.sum(KL_divergence(rho, rho_hat))
+        cost = np.sum((a3 - data) ** 2) / (2 * m) 
 
         # Backprop
         delta_sparse = - rho / rho_hat + (1 - rho) / (1 - rho_hat)
@@ -69,9 +70,9 @@ class AutoEncoder:
         return cost, grad_W1, grad_b1, grad_W2, grad_b2
     
     def reconstruct(self, data):
-        z2 = np.dot(self.W1, data) + b1
+        z2 = np.dot(self.W1, data) + self.b1
         a2 = sigmoid(z2)
-        z3 = np.dot(self.W2, a2) + b2
+        z3 = np.dot(self.W2, a2) + self.b2
         a3 = sigmoid(z3)
         return a3
 
@@ -97,11 +98,13 @@ def main():
         ae.W2 -= rate * grad_W2
         ae.b1 -= rate * grad_b1
         ae.b2 -= rate * grad_b2
-        if i % 30 == 0:
+        if (i + 1) % 100 == 0:
             t2 = time.time()
             rate *= 0.95
-            print i, cost, (t2 - t1) * 1000000
+            print i + 1, cost, (t2 - t1) * 1000000
             t1 = time.time()
+    with open("ae.pkl", "wb") as fout:
+        cPickle.dump(ae, fout, 2)
 
 if __name__ == "__main__":
     main()
