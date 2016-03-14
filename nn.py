@@ -1,6 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import time
+import cPickle
 
 MAX_IT = 50000
 N = 30
@@ -91,19 +91,13 @@ def tanh_prime(x):
 def main():
     np.random.seed(42)
     x, y = load_data()
-    print "start training on CPU"
 
     network = Network()
     network.add_layer(FullyConnectedLayer(1, N)) #hidden layer
     network.add_layer(LeastSquareLayer(N, 1))    #output layer
     network.fit(x, y, 100000)
-
-    nn_x = np.linspace(0, 2 * np.pi, 1000).reshape((1, -1))
-    nn_y = network.predict(nn_x)
-
-    plt.title("Fitted curve of CPU NN")
-    plt.plot(nn_x.ravel(), nn_y.ravel())
-    plt.show()
+    with open("nn.pkl", "wb") as fout:
+        cPickle.dump(network, fout, 2)
 
 if __name__ == "__main__":
     main()
