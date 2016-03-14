@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import time
 
 MAX_IT = 50000
-N = 10
+N = 30
 
 class FullyConnectedLayer:
     def __init__(self, dim_input, n_neuron):
